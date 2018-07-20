@@ -1,36 +1,40 @@
 import React, { Component } from 'react';
 import Person from './Person/Person';
 import './App.css';
+// import Radium, { StyleRoot } from 'radium';
 
 
 class App extends Component {
   state = {
     persons: [
-      { name: 'Robert', age: 48 },
-      { name: 'Paige', age: 14 },
-      { name: 'Hailey', age: 13 }
+      { id: 'fefe', name: 'Robert', age: 48 },
+      { id: 'ffdd', name: 'Paige', age: 14 },
+      { id: 'ngnt', name: 'Hailey', age: 13 }
     ],
     showPersons: false
   }
-  switchNameHandler = (newName) => {
-    // console.log('was clicked');
-    // Dont do this
-    //this.state.persons[0].name = 'Robert Thomas';
-    this.setState({
-      persons: [
-        { name: newName, age: 48 },
-        { name: 'Paige', age: 15 },
-        { name: 'Hailey', age: 18 }
-      ]
-    })
+  deletePersonHandler = (personIndex) => {
+    // const persons = this.state.persons.slice();
+    const persons = [...this.state.persons];
+    persons.splice(personIndex, 1);
+    this.setState({persons: persons});
   }
-  nameChangedHandler = (event) => {
+  nameChangedHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
+
+    const person = {
+      ...this.state.persons[personIndex]
+    };
+
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
     this.setState({
-      persons: [
-        { name: 'RT', age: 48 },
-        { name: event.target.value, age: 15 },
-        { name: 'Hailey', age: 18 }
-      ]
+      persons: persons
     })
   }
   togglePersonsHandler = () => {
@@ -40,46 +44,64 @@ class App extends Component {
 
   render() {
     const style = {
-      backgroundColor: 'white',
+      backgroundColor: 'green',
       font: 'inherit',
       border: '1px solid blue',
       padding: '8px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      color: 'white'
+      // ':hover': {
+      //   backgroundColor: 'lightgreen',
+      //   color: 'black'
+      // }
     };
 
 let persons = null;
 if (this.state.showPersons) {
   persons = (
     <div>
-      <Person
-        name={this.state.persons[0].name}
-        age={this.state.persons[0].age}
-      />
-      <Person
-        name={this.state.persons[1].name}
-        age={this.state.persons[1].age}
-        click={this.switchNameHandler.bind(this, 'Rob!')}
-        changed={this.nameChangedHandler}>My Hobbies: Walks</Person>
-      <Person
-        name={this.state.persons[2].name}
-        age={this.state.persons[2].age}
-      />
+      {this.state.persons.map((person, index) => {
+        return <Person
+          click={() => this.deletePersonHandler(index)}
+          name={person.name}
+          age={person.age}
+          key={person.id}
+          changed={(event) => this.nameChangedHandler(event, person.id)} />
+      })}
     </div>
-  )
+  );
+  style.backgroundColor = 'red';
+  style[':hover'] = {
+    backgroundColor: 'orange',
+      color: 'black'
+  }
 }
+// meed to use join to create a space between class names
+// let classes = ['red', 'bold'].join(' ');
+  const classes = [];
+  if (this.state.persons.length <=2) {
+    classes.push('red');
+  }
+  if (this.state.persons.length <= 1) {
+    classes.push('bold');
+  }
     return (
-      <div className="App">
-       <h1>React App</h1>
-       {/*} <button style={style}onClick={() => this.switchNameHandler('Robert Thomas')}>Switch Name</button>*/}
-        <button
-          style={style}
-          onClick={this.togglePersonsHandler}>Switch Name</button>
-        { persons }
-      </div>
+     //for radium <StyleRoot>
+        <div className="App">
+        <h1>React App</h1>
+        <p className={classes.join(' ')}>This is really working!!!</p>
+        {/*} <button style={style}onClick={() => this.switchNameHandler('Robert Thomas')}>Switch Name</button>*/}
+          <button
+            style={style}
+            onClick={this.togglePersonsHandler}>Toggle Persons</button>
+          { persons }
+        </div>
+      // </StyleRoot>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'React App'));
 
   }
 }
 
+// export default Radium(App);
 export default App;
